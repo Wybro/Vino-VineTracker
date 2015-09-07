@@ -52,6 +52,10 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
         fetchNewData(self.getUserSearchSettings())
     }
     
+    override func viewDidAppear(animated: Bool) {
+//        fetchNewData(self.getUserSearchSettings())
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
