@@ -487,6 +487,7 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
                 self.userSearchField.alpha = 1
                 }) { (completed) -> Void in
                     self.searchButton.tag = 1
+                    self.userSearchField.becomeFirstResponder()
             }
         })
     }
