@@ -16,6 +16,14 @@ class VineUser: NSObject {
     var followerCount: Int!
     var loopCount: Int!
     
+    override init() {
+        self.username = ""
+        self.userId = 0
+        self.avatarPic = UIImage(named: "defaultProfPic")
+        self.followerCount = 0
+        self.loopCount = 0
+    }
+    
     init (username: String, userId: Int, avatarPic: UIImage, followerCount: Int, loopCount: Int) {
         super.init()
         

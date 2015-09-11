@@ -39,18 +39,24 @@ class VineConnection: NSObject {
                     completionHandler(vineUser)
                 }
             }
+//            else {
+//                println("some error")
+//            }
         }
     }
     
-    class func getUserDataForName(username: String, completionHandler:(VineUser)->()){
+    class func getUserDataForName(username: String, completionHandler:(VineUser, error:String)->()){
         let urlSearchString: String = username.stringByReplacingOccurrencesOfString(" ", withString: "-")
         let url = NSURL(string: "https://api.vineapp.com/users/search/\(urlSearchString)")
         
         let urlRequest = NSURLRequest(URL: url!)
-        
         NSURLConnection.sendAsynchronousRequest(urlRequest, queue: NSOperationQueue()) { (response:NSURLResponse!, data:NSData!, error:NSError!) -> Void in
+//            println("error: \(error)")
             if let returnedData = data {
+//                println("Error: \(error)")
+//                println("Data: \(data)")
                 var userData = JSON(data: data!)
+//                println(userData)
                 
                 if let firstUser = userData["data"]["records"][0].dictionary {
                     let username = firstUser["username"]!.string
@@ -67,9 +73,18 @@ class VineConnection: NSObject {
                     let loopCount = firstUser["loopCount"]!.int
                     
                     let vineUser = VineUser(username: username!, userId: userId!, avatarPic: avatarPic!, followerCount: followerCount!, loopCount: loopCount!)
-                    completionHandler(vineUser)
+                    completionHandler(vineUser, error: "")
+                }
+                else {
+                    // No user found
+//                    println("No user found")
+                    let emptyVineUser = VineUser()
+                    completionHandler(emptyVineUser, error: "No user found")
                 }
             }
+//            else {
+//                println("some error")
+//            }
         }
     }
 
