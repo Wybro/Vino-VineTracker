@@ -101,9 +101,11 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
         UserDefaultsManager.loadUserFromCache { (savedUser) -> () in
             if let displaySetting = UserDefaultsManager.getUserDisplaySetting() as String!{
                 if displaySetting == "followerView" {
+//                    println("new followers from yesterday: \(savedUser.newFollowersFromPreviousDate)")
                     self.updateInfoViewLabel(savedUser.newFollowersFromPreviousDate)
                 }
                 else if displaySetting == "loopView" {
+//                    println("new loops from yesterday: \(savedUser.newLoopsFromPreviousDate)")
                     self.updateInfoViewLabel(savedUser.newLoopsFromPreviousDate)
                 }
             }
@@ -295,7 +297,9 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
                         var startingFollowers = foundUser!.startingFollowers
                         var startingLoops = foundUser!.startingLoops
                         newFollowersFromPreviousDate = foundUser!.newFollowersFromPreviousDate!
+//                        println("new followers from yesterday: \(foundUser!.newFollowersFromPreviousDate)")
                         newLoopsFromPreviousDate = foundUser!.newLoopsFromPreviousDate!
+//                        println("new loops from yesterday: \(foundUser!.newLoopsFromPreviousDate)")
                         
                         newFollowers = vineUser.followerCount - startingFollowers
                         newLoops = vineUser.loopCount - startingLoops
@@ -303,6 +307,9 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
                         if !calendar.isDateInToday(foundUser!.date) {
                             startingFollowers = vineUser.followerCount
                             startingLoops = vineUser.loopCount
+                            
+                            newFollowersFromPreviousDate = newFollowers
+                            newLoopsFromPreviousDate = newLoops
                         }
                         
                         var now = NSDate()
@@ -320,9 +327,20 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
                         println("User not found -- creating new record")
                         var now = NSDate()
                         
-                        var newUser = SavedUser(username: vineUser.username, userId: vineUser.userId, avatarPic: vineUser.avatarPic, followerCount: vineUser.followerCount, newFollowers: newFollowersFromPreviousDate, followerDataPoints: [vineUser.followerCount], loopCount: vineUser.loopCount, newLoops: newLoops, loopDataPoints: [vineUser.loopCount], date: now, startingFollowers: vineUser.followerCount, newFollowersFromPreviousDate: newFollowers, startingLoops: vineUser.loopCount, newLoopsFromPreviousDate: newLoops)
+                        var newUser = SavedUser(username: vineUser.username, userId: vineUser.userId, avatarPic: vineUser.avatarPic, followerCount: vineUser.followerCount, newFollowers: newFollowersFromPreviousDate, followerDataPoints: [vineUser.followerCount], loopCount: vineUser.loopCount, newLoops: newLoops, loopDataPoints: [vineUser.loopCount], date: now, startingFollowers: vineUser.followerCount, newFollowersFromPreviousDate: 0, startingLoops: vineUser.loopCount, newLoopsFromPreviousDate: 0)
                         UserDefaultsManager.saveUser(newUser, key: "\(vineUser.userId)")
                         UserDefaultsManager.saveUserToCache(newUser)
+                        
+                        if let displaySetting = UserDefaultsManager.getUserDisplaySetting() as String!{
+                            if displaySetting == "followerView" {
+                                self.updateGraph([vineUser.followerCount])
+                            }
+                            else if displaySetting == "loopView" {
+                                self.updateGraph([vineUser.loopCount])
+                            }
+                        }
+
+                        
                     }
                     
                     // Use separate UI update function here
