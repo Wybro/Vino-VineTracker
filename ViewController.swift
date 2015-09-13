@@ -55,8 +55,6 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
         followerLineChartView.showsVerticalSelection = false
         followerLineChartView.reloadData()
         
-        //        println("Launched")
-        
         self.avatarPicImageView.layer.cornerRadius = self.avatarPicImageView.frame.size.width / 2
         self.avatarPicImageView.clipsToBounds = true
         
