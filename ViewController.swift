@@ -13,6 +13,7 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
     
     let customGreenBackground = UIColor(red: 19/255, green: 183/255, blue: 121/255, alpha: 1)
     let customPurpleBackground = UIColor(red: 167/255, green: 99/255, blue: 208/255, alpha: 1)
+    let customLightPurpleBackground = UIColor(red: 196/255, green: 141/255, blue: 228/255, alpha: 1)
     
     var dataPoints: [Int] = [Int]()
     
@@ -299,8 +300,8 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
                         newLoopsFromPreviousDate = foundUser!.newLoopsFromPreviousDate!
 //                        println("new loops from yesterday: \(foundUser!.newLoopsFromPreviousDate)")
                         
-                        newFollowers = vineUser.followerCount - startingFollowers
-                        newLoops = vineUser.loopCount - startingLoops
+//                        newFollowers = vineUser.followerCount - startingFollowers
+//                        newLoops = vineUser.loopCount - startingLoops
                         
                         if !calendar.isDateInToday(foundUser!.date) {
                             startingFollowers = vineUser.followerCount
@@ -309,6 +310,9 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
                             newFollowersFromPreviousDate = newFollowers
                             newLoopsFromPreviousDate = newLoops
                         }
+                        
+                        newFollowers = vineUser.followerCount - startingFollowers
+                        newLoops = vineUser.loopCount - startingLoops
                         
                         var now = NSDate()
                         
