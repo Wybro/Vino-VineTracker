@@ -36,7 +36,7 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
     @IBOutlet var followerSettingHorizontalConstraint: NSLayoutConstraint!
     @IBOutlet var loopSettingHorizontalConstraint: NSLayoutConstraint!
     @IBOutlet var settingTypeLabel: UILabel!
-
+    
     @IBOutlet var actionPopoverView: UIView!
     @IBOutlet var shadowView: UIView!
     @IBOutlet var actionPopoverImageView: UIImageView!
@@ -46,7 +46,7 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
     
     override func viewDidLoad() {
         super.viewDidLoad()
-            
+        
         userSearchField.delegate = self
         
         followerLineChartView.dataSource = self
@@ -66,14 +66,14 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
         actionPopoverView.layer.shadowOpacity = 1
         actionPopoverView.layer.shadowOffset = CGSize(width: 0, height: 2)
         actionPopoverView.layer.shadowRadius = 3
-
+        
         checkUserSearchSettings()
         checkUserDisplaySetting()
         fetchNewData(UserDefaultsManager.getUserSearchSettings())
     }
     
     override func viewDidAppear(animated: Bool) {
-
+        
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -100,11 +100,11 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
         UserDefaultsManager.loadUserFromCache { (savedUser) -> () in
             if let displaySetting = UserDefaultsManager.getUserDisplaySetting() as String!{
                 if displaySetting == "followerView" {
-//                    println("new followers from yesterday: \(savedUser.newFollowersFromPreviousDate)")
+                    //                    println("new followers from yesterday: \(savedUser.newFollowersFromPreviousDate)")
                     self.updateInfoViewLabel(savedUser.newFollowersFromPreviousDate)
                 }
                 else if displaySetting == "loopView" {
-//                    println("new loops from yesterday: \(savedUser.newLoopsFromPreviousDate)")
+                    //                    println("new loops from yesterday: \(savedUser.newLoopsFromPreviousDate)")
                     self.updateInfoViewLabel(savedUser.newLoopsFromPreviousDate)
                 }
             }
@@ -179,7 +179,7 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
                 loopViewMode()
             }
         }
-        // First time entering app
+            // First time entering app
         else {
             // Set default view to followers
             println("first time entering app")
@@ -240,7 +240,7 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
                 showActionPopoverView("loading")
                 
                 VineConnection.getUserDataForName(searchString!, completionHandler: { (vineUser:VineUser, error:String) -> () in
-
+                    
                     if !error.isEmpty {
                         println("error: \(error)")
                         self.stopSpinningAction()
@@ -254,7 +254,7 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
                     }
                     
                     self.hideUserSearch()
-
+                    
                     // Update settings
                     var foundUser: SavedUser? = nil
                     var newFollowers = 0
@@ -288,33 +288,46 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
                                 self.updateGraph(loopDataPoints)
                             }
                         }
-//                        self.updateGraph(followerDataPoints)
-                        // Update graphs here
                         
                         let calendar = NSCalendar.currentCalendar()
                         
                         var startingFollowers = foundUser!.startingFollowers
                         var startingLoops = foundUser!.startingLoops
                         newFollowersFromPreviousDate = foundUser!.newFollowersFromPreviousDate!
-//                        println("new followers from yesterday: \(foundUser!.newFollowersFromPreviousDate)")
                         newLoopsFromPreviousDate = foundUser!.newLoopsFromPreviousDate!
-//                        println("new loops from yesterday: \(foundUser!.newLoopsFromPreviousDate)")
-                        
-//                        newFollowers = vineUser.followerCount - startingFollowers
-//                        newLoops = vineUser.loopCount - startingLoops
                         
                         if !calendar.isDateInToday(foundUser!.date) {
+                            
+                            // Data is one day old
+                            if calendar.isDateInYesterday(foundUser!.date) {
+                                // Update newLoops/Follower data
+                                newFollowersFromPreviousDate = vineUser.followerCount - startingFollowers
+                                newLoopsFromPreviousDate = vineUser.loopCount - startingLoops
+                            }
+                                // Data is older than one day
+                            else {
+                                // Reset values to 0
+                                newFollowersFromPreviousDate = 0
+                                newLoopsFromPreviousDate = 0
+                            }
+                            
+                            // Reset starting values
                             startingFollowers = vineUser.followerCount
                             startingLoops = vineUser.loopCount
                             
-                            newFollowersFromPreviousDate = newFollowers
-                            newLoopsFromPreviousDate = newLoops
                         }
                         
                         newFollowers = vineUser.followerCount - startingFollowers
                         newLoops = vineUser.loopCount - startingLoops
                         
                         var now = NSDate()
+                        
+                        //                        var testDate = NSDate(timeInterval: -86500, sinceDate: now) // TEST - REMOVE
+                        //                        println("TEST DATE: \(testDate)") // TEST - REMOVE
+                        //                        println("Starting Loops: \(startingLoops)") // TEST - REMOVE
+                        //                        println("New Loops: \(newLoops)") // TEST - REMOVE
+                        //                        println("Starting Followers: \(startingFollowers)") // TEST - REMOVE
+                        //                        println("New Followers: \(newFollowers)") // TEST - REMOVE
                         
                         let userToSave = SavedUser(username: vineUser.username, userId: vineUser.userId, avatarPic: vineUser.avatarPic, followerCount: vineUser.followerCount, newFollowers: newFollowers, followerDataPoints: followerDataPoints, loopCount: vineUser.loopCount, newLoops: newLoops, loopDataPoints: loopDataPoints, date: now, startingFollowers: startingFollowers, newFollowersFromPreviousDate: newFollowersFromPreviousDate, startingLoops: startingLoops, newLoopsFromPreviousDate: newLoopsFromPreviousDate)
                         
@@ -341,7 +354,7 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
                                 self.updateGraph([vineUser.loopCount])
                             }
                         }
-
+                        
                         
                     }
                     
@@ -354,7 +367,7 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
                             self.updateLabels(vineUser.loopCount, newFollowers: newLoops)
                         }
                     }
-//                    self.updateLabels(vineUser.followerCount, newFollowers: newFollowers)
+                    //                    self.updateLabels(vineUser.followerCount, newFollowers: newFollowers)
                     self.updateAvatarPic(vineUser.avatarPic)
                 })
             }
@@ -425,7 +438,7 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
         if sender.tag == 0 {
             showFollowerSettingButton()
             showLoopSettingButton()
-//            sender.tag = 1
+            //            sender.tag = 1
         }
         else {
             hideFollowerSettingButton()
