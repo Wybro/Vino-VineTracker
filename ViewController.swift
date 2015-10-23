@@ -84,9 +84,9 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
         // Dispose of any resources that can be recreated.
     }
     
-    override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent) {
-        var touch = touches.first as! UITouch
-        var point = touch.locationInView(self.view)
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        let touch = touches.first as UITouch!
+        let point = touch.locationInView(self.view)
         
         userSearchField.resignFirstResponder()
         hideUserSearch()
@@ -154,13 +154,13 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
     }
     
     @IBAction func refresh(sender: AnyObject) {
-        println("Refreshing")
+        print("Refreshing")
         refreshAnimation()
         fetchNewData(UserDefaultsManager.getUserSearchSettings())
     }
     
     func checkUserSearchSettings() {
-        if let searchSetting = UserDefaultsManager.getUserSearchSettings() as String! {
+        if let _ = UserDefaultsManager.getUserSearchSettings() as String! {
             refreshButton.enabled = true
         }
         else {
@@ -171,25 +171,25 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
     func checkUserDisplaySetting() {
         if let displaySetting = UserDefaultsManager.getUserDisplaySetting() as String! {
             if displaySetting == "followerView" {
-                println("followerView display setting")
+                print("followerView display setting")
                 followerViewMode()
             }
             else if displaySetting == "loopView" {
-                println("loopView display setting")
+                print("loopView display setting")
                 loopViewMode()
             }
         }
             // First time entering app
         else {
             // Set default view to followers
-            println("first time entering app")
+            print("first time entering app")
             UserDefaultsManager.updateUserDisplaySetting("followerView")
             followerViewMode()
         }
     }
     
     func followerViewMode() {
-        println("followerViewMode")
+        print("followerViewMode")
         UserDefaultsManager.updateUserDisplaySetting("followerView")
         dispatch_async(dispatch_get_main_queue(), { () -> Void in
             self.settingTypeLabel.text = "followers"
@@ -207,7 +207,7 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
     }
     
     func loopViewMode() {
-        println("loopViewMode")
+        print("loopViewMode")
         UserDefaultsManager.updateUserDisplaySetting("loopView")
         dispatch_async(dispatch_get_main_queue(), { () -> Void in
             self.settingTypeLabel.text = "loops"
@@ -233,7 +233,7 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
     }
     
     func fetchNewData(searchString: String?) {
-        println("Fetching data")
+        print("Fetching data")
         if (searchString != nil) {
             if !searchString!.isEmpty {
                 
@@ -242,14 +242,14 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
                 VineConnection.getUserDataForName(searchString!, completionHandler: { (vineUser:VineUser, error:String) -> () in
                     
                     if !error.isEmpty {
-                        println("error: \(error)")
+                        print("error: \(error)")
                         self.stopSpinningAction()
                         self.showActionPopoverView("noUser")
                         return
                     }
                     else {
                         self.hideActionPopoverView()
-                        println("search successful - saving search")
+                        print("search successful - saving search")
                         UserDefaultsManager.updateUserSearchSettings(searchString!)
                     }
                     
@@ -263,7 +263,7 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
                     var newLoopsFromPreviousDate = 0
                     
                     UserDefaultsManager.getSavedUser("\(vineUser.userId)", completionHandler: { (savedUser) -> () in
-                        println("saved user: \(savedUser)")
+                        print("saved user: \(savedUser)")
                         foundUser = savedUser
                     })
                     
@@ -320,7 +320,7 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
                         newFollowers = vineUser.followerCount - startingFollowers
                         newLoops = vineUser.loopCount - startingLoops
                         
-                        var now = NSDate()
+                        let now = NSDate()
                         
                         //                        var testDate = NSDate(timeInterval: -86500, sinceDate: now) // TEST - REMOVE
                         //                        println("TEST DATE: \(testDate)") // TEST - REMOVE
@@ -333,16 +333,16 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
                         
                         UserDefaultsManager.saveUser(userToSave, key: "\(vineUser.userId)")
                         UserDefaultsManager.saveUserToCache(userToSave)
-                        println("User Found")
-                        println(userToSave)
+                        print("User Found")
+                        print(userToSave)
                         
                         
                     }
                     else {
-                        println("User not found -- creating new record")
-                        var now = NSDate()
+                        print("User not found -- creating new record")
+                        let now = NSDate()
                         
-                        var newUser = SavedUser(username: vineUser.username, userId: vineUser.userId, avatarPic: vineUser.avatarPic, followerCount: vineUser.followerCount, newFollowers: newFollowersFromPreviousDate, followerDataPoints: [vineUser.followerCount], loopCount: vineUser.loopCount, newLoops: newLoops, loopDataPoints: [vineUser.loopCount], date: now, startingFollowers: vineUser.followerCount, newFollowersFromPreviousDate: 0, startingLoops: vineUser.loopCount, newLoopsFromPreviousDate: 0)
+                        let newUser = SavedUser(username: vineUser.username, userId: vineUser.userId, avatarPic: vineUser.avatarPic, followerCount: vineUser.followerCount, newFollowers: newFollowersFromPreviousDate, followerDataPoints: [vineUser.followerCount], loopCount: vineUser.loopCount, newLoops: newLoops, loopDataPoints: [vineUser.loopCount], date: now, startingFollowers: vineUser.followerCount, newFollowersFromPreviousDate: 0, startingLoops: vineUser.loopCount, newLoopsFromPreviousDate: 0)
                         UserDefaultsManager.saveUser(newUser, key: "\(vineUser.userId)")
                         UserDefaultsManager.saveUserToCache(newUser)
                         
@@ -376,8 +376,8 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
     
     func updateLabels(followers: Int, newFollowers: Int) {
         dispatch_async(dispatch_get_main_queue(), { () -> Void in
-            var followersFormatted = NSNumberFormatter.localizedStringFromNumber(followers, numberStyle: NSNumberFormatterStyle.DecimalStyle)
-            var newFollowersFormatted = NSNumberFormatter.localizedStringFromNumber(newFollowers, numberStyle: NSNumberFormatterStyle.DecimalStyle)
+            let followersFormatted = NSNumberFormatter.localizedStringFromNumber(followers, numberStyle: NSNumberFormatterStyle.DecimalStyle)
+            let newFollowersFormatted = NSNumberFormatter.localizedStringFromNumber(newFollowers, numberStyle: NSNumberFormatterStyle.DecimalStyle)
             
             self.followerCountLabel.text = followersFormatted
             
@@ -392,7 +392,7 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
     
     func updateInfoViewLabel(newFollowers: Int) {
         dispatch_async(dispatch_get_main_queue(), { () -> Void in
-            var newFollowersFormatted = NSNumberFormatter.localizedStringFromNumber(newFollowers, numberStyle: NSNumberFormatterStyle.DecimalStyle)
+            let newFollowersFormatted = NSNumberFormatter.localizedStringFromNumber(newFollowers, numberStyle: NSNumberFormatterStyle.DecimalStyle)
             
             if newFollowers >= 0 {
                 self.newFollowersFromPreviousDayLabel.text = "+\(newFollowersFormatted)"
@@ -411,8 +411,8 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
     
     func updateGraph(dataPointsArr: [Int]) {
         dataPoints.removeAll(keepCapacity: false)
-        println("Updating graph")
-        println(dataPointsArr)
+        print("Updating graph")
+        print(dataPointsArr)
         for entry in dataPointsArr {
             dataPoints.append(Int(entry as NSNumber))
         }

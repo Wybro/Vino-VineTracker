@@ -12,7 +12,7 @@ class UserDefaultsManager: NSObject {
     
     class func getUserSearchSettings() -> String? {
         let sharedDefaults = NSUserDefaults(suiteName: "group.com.Wybro.Vino-VineTracker")
-        var returnString = sharedDefaults?.objectForKey("userSearchString") as? String
+        let returnString = sharedDefaults?.objectForKey("userSearchString") as? String
 //        println(returnString)
         return returnString
     }
@@ -26,7 +26,7 @@ class UserDefaultsManager: NSObject {
     
     class func getUserDisplaySetting() -> String? {
         let sharedDefaults = NSUserDefaults(suiteName: "group.com.Wybro.Vino-VineTracker")
-        var returnString = sharedDefaults?.objectForKey("userDisplaySetting") as? String
+        let returnString = sharedDefaults?.objectForKey("userDisplaySetting") as? String
         return returnString
     }
     
@@ -38,7 +38,7 @@ class UserDefaultsManager: NSObject {
     
     class func saveUser(user: SavedUser, key: String) {
         let sharedDefaults = NSUserDefaults(suiteName: "group.com.Wybro.Vino-VineTracker")
-        let imageData: NSData = UIImageJPEGRepresentation(user.avatarPic, 1)
+        let imageData: NSData = UIImageJPEGRepresentation(user.avatarPic, 1)!
         
         let userToSave: [String: AnyObject] = ["username": user.username, "userId": user.userId, "imageData": imageData, "followerCount": user.followerCount, "newFollowers": user.newFollowers, "followerDataPoints": user.followerDataPoints, "loopCount": user.loopCount, "newLoops": user.newLoops, "loopDataPoints": user.loopDataPoints, "date": user.date, "startingFollowers": user.startingFollowers, "newFollowersFromPreviousDate": user.newFollowersFromPreviousDate, "startingLoops": user.startingLoops, "newLoopsFromPreviousDate": user.newLoopsFromPreviousDate]
         sharedDefaults?.setObject(userToSave, forKey: key)
@@ -75,7 +75,7 @@ class UserDefaultsManager: NSObject {
     class func saveUserToCache(user: SavedUser) {
         let sharedDefaults = NSUserDefaults(suiteName: "group.com.Wybro.Vino-VineTracker")
 
-        let imageData: NSData = UIImageJPEGRepresentation(user.avatarPic, 1)
+        let imageData: NSData = UIImageJPEGRepresentation(user.avatarPic, 1)!
         
         let userToSave: [String: AnyObject] = ["username": user.username, "userId": user.userId, "imageData": imageData, "followerCount": user.followerCount, "newFollowers": user.newFollowers, "followerDataPoints": user.followerDataPoints, "loopCount": user.loopCount, "newLoops": user.newLoops, "loopDataPoints": user.loopDataPoints, "date": user.date, "startingFollowers": user.startingFollowers, "newFollowersFromPreviousDate": user.newFollowersFromPreviousDate, "startingLoops": user.startingLoops, "newLoopsFromPreviousDate": user.newLoopsFromPreviousDate]
         
