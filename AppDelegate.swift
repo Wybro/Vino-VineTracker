@@ -26,6 +26,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     // Support for background fetch
     func application(application: UIApplication, performFetchWithCompletionHandler completionHandler: (UIBackgroundFetchResult) -> Void) {
+        print("Backfround Fetch")
         if let mainViewController = window?.rootViewController as! ViewController? {
             mainViewController.backgroundFetch({ () -> Void in
                 completionHandler(.NewData)
@@ -50,6 +51,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationDidBecomeActive(application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        print("App did become active")
+        if let mainViewController = window?.rootViewController as! ViewController? {
+            mainViewController.backgroundFetch({ () -> Void in
+            })
+        }
     }
 
     func applicationWillTerminate(application: UIApplication) {

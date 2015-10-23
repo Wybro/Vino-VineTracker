@@ -17,6 +17,11 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
     
     var dataPoints: [Int] = [Int]()
     
+    // Results of searching for user by name
+    var userSearchResults = [VineUser]()
+    
+    // MARK: - UI Elements
+    
     @IBOutlet var followerLineChartView: JBLineChartView!
     
     @IBOutlet var avatarPicImageView: UIImageView!
@@ -43,6 +48,8 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
     @IBOutlet var actionPopoverLabel: UILabel!
     
     var isRotating = false
+    
+    // MARK: - View Methods
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -111,6 +118,8 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
         }
     }
     
+    // MARK: - JBChartView Methods
+    
     func numberOfLinesInLineChartView(lineChartView: JBLineChartView!) -> UInt {
         return 1
     }
@@ -139,9 +148,13 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
         return 3
     }
     
+    // MARK: - Textfield Delegate Methods
+    
     func textFieldShouldReturn(textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         fetchNewData(textField.text)
+        
+        searchForUser(textField.text)
         return true
     }
     
@@ -152,6 +165,8 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
     func textFieldDidEndEditing(textField: UITextField) {
         refreshButton.enabled = true
     }
+    
+    // MARK: - User Settings & View Mods
     
     @IBAction func refresh(sender: AnyObject) {
         print("Refreshing")
@@ -232,8 +247,29 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
         loopViewMode()
     }
     
+    // MARK: - Search Methods
+    
+    func searchForUser(searchString: String?) {
+        if (searchString != nil) {
+            if !searchString!.isEmpty {
+                userSearchResults.removeAll()
+                VineConnection.getUsersForName(searchString!, completionHandler: { (vineUsers, error) -> () in
+                    self.userSearchResults = vineUsers
+                    
+                    for user in vineUsers {
+                        print(user.username + " userID: \(user.userId)")
+                    }
+//                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
+//                        self.searchResultsTableView.reloadData()
+//                        self.showTableViewSearch()
+//                    })
+                })
+                
+            }
+        }
+    }
+    
     func backgroundFetch(completion: () ->  Void) {
-        print("Backfround Fetch")
        fetchNewData(UserDefaultsManager.getUserSearchSettings())
         completion()
     }
@@ -379,6 +415,8 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
             }
         }
     }
+    
+    // MARK: - Update UI Methods
     
     func updateLabels(followers: Int, newFollowers: Int) {
         dispatch_async(dispatch_get_main_queue(), { () -> Void in
@@ -608,7 +646,7 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
         }
     }
     
-    //MARK: ActionPopoverView Methods
+    //MARK: - ActionPopoverView Methods
     
     func showActionPopoverView(type: String) {
         dispatch_async(dispatch_get_main_queue(), { () -> Void in

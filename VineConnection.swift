@@ -147,5 +147,79 @@ class VineConnection: NSObject {
 ////            }
 //        }
     }
+    
+    class func getUsersForName(username: String, completionHandler:([VineUser], error:String)->()){
+        let urlSearchString: String = username.stringByReplacingOccurrencesOfString(" ", withString: "-")
+        let url = NSURL(string: "https://api.vineapp.com/users/search/\(urlSearchString)")
+        let urlRequest = NSURLRequest(URL: url!)
+        
+        let task = NSURLSession.sharedSession().dataTaskWithRequest(urlRequest) { (data: NSData?, response: NSURLResponse?, error: NSError?) -> Void in
+            if let _ = data {
+                //                println("Error: \(error)")
+                //                println("Data: \(data)")
+                var userData = JSON(data: data!)
+                //                println(userData)
+                var returnedUsersArray = [VineUser]()
+                
+                if let returnedUsers = userData["data"]["records"].array {
+                    for selectedUser in returnedUsers {
+                        if let thisUser = selectedUser.dictionary {
+                            let username = thisUser["username"]!.string
+                            let userId = thisUser["userId"]!.int
+                            var avatarPic = UIImage(named: "defaultProfPic")
+                            if let avatarUrl = thisUser["avatarUrl"]?.string {
+                                if let imageUrl = NSURL(string: avatarUrl) {
+                                    if let data = NSData(contentsOfURL: imageUrl) {
+                                        avatarPic = UIImage(data: data)
+                                    }
+                                }
+                            }
+                            let followerCount = thisUser["followerCount"]!.int
+                            let loopCount = thisUser["loopCount"]!.int
+                            
+                            let vineUser = VineUser(username: username!, userId: userId!, avatarPic: avatarPic!, followerCount: followerCount!, loopCount: loopCount!)
+                            
+                            returnedUsersArray.append(vineUser)
+                            
+                        }
+                    }
+                    completionHandler(returnedUsersArray, error: "")
+                }
+                else {
+                    let emptyVineUser = VineUser()
+                    completionHandler([emptyVineUser], error: "No user found")
+                }
+                
+                //
+                //                if let firstUser = userData["data"]["records"][0].dictionary {
+                //                    let username = firstUser["username"]!.string
+                //                    let userId = firstUser["userId"]!.int
+                //                    var avatarPic = UIImage(named: "defaultProfPic")
+                //                    if let avatarUrl = firstUser["avatarUrl"]?.string {
+                //                        if let imageUrl = NSURL(string: avatarUrl) {
+                //                            if let data = NSData(contentsOfURL: imageUrl) {
+                //                                avatarPic = UIImage(data: data)
+                //                            }
+                //                        }
+                //                    }
+                //                    let followerCount = firstUser["followerCount"]!.int
+                //                    let loopCount = firstUser["loopCount"]!.int
+                //
+                //                    let vineUser = VineUser(username: username!, userId: userId!, avatarPic: avatarPic!, followerCount: followerCount!, loopCount: loopCount!)
+                //                    completionHandler(vineUser, error: "")
+                //                }
+                //                else {
+                //                    // No user found
+                //                    //                    println("No user found")
+                //                    let emptyVineUser = VineUser()
+                //                    completionHandler(emptyVineUser, error: "No user found")
+                //                }
+                //            }
+                //
+                //
+            }
+        }
+        task.resume()
+    }
 
 }
