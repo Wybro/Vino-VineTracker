@@ -232,6 +232,12 @@ class ViewController: UIViewController, JBLineChartViewDelegate, JBLineChartView
         loopViewMode()
     }
     
+    func backgroundFetch(completion: () ->  Void) {
+        print("Backfround Fetch")
+       fetchNewData(UserDefaultsManager.getUserSearchSettings())
+        completion()
+    }
+    
     func fetchNewData(searchString: String?) {
         print("Fetching data")
         if (searchString != nil) {

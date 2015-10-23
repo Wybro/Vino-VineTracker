@@ -18,7 +18,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         UIApplication.sharedApplication().setStatusBarStyle(UIStatusBarStyle.LightContent, animated: true)
         
+        // Background fetch -- minimum time between fetches (consider changing)
+        UIApplication.sharedApplication().setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalMinimum)
+        
         return true
+    }
+    
+    // Support for background fetch
+    func application(application: UIApplication, performFetchWithCompletionHandler completionHandler: (UIBackgroundFetchResult) -> Void) {
+        if let mainViewController = window?.rootViewController as! ViewController? {
+            mainViewController.backgroundFetch({ () -> Void in
+                completionHandler(.NewData)
+            })
+        }
+        
     }
 
     func applicationWillResignActive(application: UIApplication) {
